@@ -24,7 +24,7 @@ struct iphdr
     uint8_t version : 4;
     uint8_t ihl : 4;
 #else
-# error	"Please fix <bits/endian.h>"
+# error	"Исправьте <bits/endian.h>"
 #endif
     uint8_t tos;
     uint16_t tot_len;
@@ -35,7 +35,6 @@ struct iphdr
     uint16_t check;
     uint32_t saddr;
     uint32_t daddr;
-    /*The options start here. */
 };
 
 unsigned short checksum(void* b, int len) {
@@ -83,7 +82,6 @@ void clientFunction() {
         WSACleanup();
         exit(1);
     }
-    /*else cout << "Адрес переведен успешно!!\n";*/
 
     if (bind(rawSocket, (struct sockaddr*)&clientAddr, sizeof(clientAddr)) < 0) {
         cerr << "Ошибка привязки сокета: " << WSAGetLastError() << "\n";
@@ -109,7 +107,6 @@ void clientFunction() {
         }
         else {
             cout << "Пакет " << i + 1 << " получен. Количество байт : " << bytesAccept << "\n";
-            //cout << "Пакет получен. Количество байт: " << bytesAccept << " от " << inet_ntoa(clientAddr.sin_addr) << "\n";
             cout << "Пакет в виде массива символов: \n";
             for (char i : packetBuffer) cout << i;
             cout << "\n";

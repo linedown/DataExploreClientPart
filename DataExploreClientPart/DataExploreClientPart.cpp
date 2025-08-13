@@ -10,21 +10,19 @@
 #define IPPROTO_LAN 63
 
 using namespace std;
-using namespace chrono;
 
 const int messages = 10;
 const int dataLength = 1024;
 const int packetLength = 2048;
-const int delayMS = 100;
 
 struct iphdr
 {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-    unsigned int ihl : 4;
-    unsigned int version : 4;
+    uint8_t ihl : 4;
+    uint8_t version : 4;
 #elif __BYTE_ORDER == __BIG_ENDIAN
-    unsigned int version : 4;
-    unsigned int ihl : 4;
+    uint8_t version : 4;
+    uint8_t ihl : 4;
 #else
 # error	"Please fix <bits/endian.h>"
 #endif
@@ -40,20 +38,6 @@ struct iphdr
     /*The options start here. */
 };
 
-/*Оператор >>  означает побитовый сдвиг числа вправо на определенное количество разрядов. В данном случае sum >> 16
-означает сдвиг sum на 16 разрядов вправо.
-
-Побитовые операторы & и | используются для манипуляции битами чисел. В случае подсчета контрольной суммы IP-заголовка,
-побитовые операторы используются для корректного вычисления контрольной суммы.
-
-sum & 0xFFFF побитово "и" (&) используется для получения младшего слова (нижние 16 бит) sum.
-sum >> 16 сдвигает sum на 16 разрядов вправо.
-sum = (sum >> 16) + (sum & 0xFFFF) складывает младшее слово и результат сдвига, учитывая переносы.
-sum + (sum >> 16) корректно складывает результаты сдвига и младшего слова, учитывая возможные переносы.
-result является однократно инвертированным(~) суммарным результатом.
-Эти операции являются частью алгоритма подсчета контрольной суммы IPv4 заголовка и позволяют вычислить контрольную сумму, учитывая все поля структуры. */
-
-// Функция для подсчета контрольной суммы
 unsigned short checksum(void* b, int len) {
     unsigned short* buf = static_cast<unsigned short*>(b);
     unsigned int sum = 0;
@@ -93,7 +77,6 @@ void clientFunction() {
     clientAddr.sin_family = AF_INET;
     clientAddr.sin_port = 0;
 
-    //serverAddr.sin_port = htons(25565);
     if (inet_pton(AF_INET, "192.168.88.44", &clientAddr.sin_addr) < 0) {
         cerr << "Ошибка при переводе адреса: " << WSAGetLastError() << "\n";
         closesocket(rawSocket);
@@ -131,13 +114,13 @@ void clientFunction() {
             for (char i : packetBuffer) cout << i;
             cout << "\n";
             iphdr* ipheader = (iphdr*)(packetBuffer);
-            cout << "Версия протокола IP: " << ipheader->version << "\n";
-            cout << "Длина заголовка: " << ipheader->ihl << "\n";
+            cout << "Версия протокола IP: " << static_cast<int>(ipheader->version) << "\n";
+            cout << "Длина заголовка: " << static_cast<int>(ipheader->ihl) << "\n";
             cout << "Чек-сумма: " << ntohs(ipheader->check) << "\n";
             cout << "Флаги заголовка: " << ipheader->frag_off << "\n";
-            cout << "ToS: " << ipheader->tos << "\n";
+            cout << "ToS: " << static_cast<int>(ipheader->tos) << "\n";
             cout << "TTL: " << static_cast<int>(ipheader->ttl) << "\n";
-            cout << "Версия протокола" << static_cast<int>(ipheader->protocol) << "\n";
+            cout << "Версия протокола: " << static_cast<int>(ipheader->protocol) << "\n";
             cout << "Общая длина: " << ipheader->tot_len << "\n";
 
             if (ipheader->version != 4) {

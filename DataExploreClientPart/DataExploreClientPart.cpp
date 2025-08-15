@@ -93,7 +93,7 @@ void clientFunction() {
 
     cout << "Клиент принимает данные..." << "\n";
 
-    char packetBuffer[packetLength];
+    char packetBuffer[packetLength] = {0};
     struct sockaddr_in serverAddr;
     int serverAddrSize = sizeof serverAddr;
 
@@ -111,14 +111,6 @@ void clientFunction() {
             for (char i : packetBuffer) cout << i;
             cout << "\n";
             iphdr* ipheader = (iphdr*)(packetBuffer);
-            cout << "Версия протокола IP: " << static_cast<int>(ipheader->version) << "\n";
-            cout << "Длина заголовка: " << static_cast<int>(ipheader->ihl) << "\n";
-            cout << "Чек-сумма: " << ntohs(ipheader->check) << "\n";
-            cout << "Флаги заголовка: " << ipheader->frag_off << "\n";
-            cout << "ToS: " << static_cast<int>(ipheader->tos) << "\n";
-            cout << "TTL: " << static_cast<int>(ipheader->ttl) << "\n";
-            cout << "Версия протокола: " << static_cast<int>(ipheader->protocol) << "\n";
-            cout << "Общая длина: " << ipheader->tot_len << "\n";
 
             if (ipheader->version != 4) {
                 cout << "Неправильная версия протокола!\n";
